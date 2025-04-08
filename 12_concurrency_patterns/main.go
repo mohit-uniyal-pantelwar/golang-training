@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"sync"
+	"time"
 )
 
 func doWork(done <-chan bool) {
@@ -87,12 +89,34 @@ func main() {
 
 	//*******pipeline**********
 
-	nums := []int{1, 2, 3, 4, 5, 6}
+	// nums := []int{1, 2, 3, 4, 5, 6}
 
-	dataChannel := sliceToChannel(nums)
-	finalChannel := sq(dataChannel)
+	// dataChannel := sliceToChannel(nums)
+	// finalChannel := sq(dataChannel)
 
-	for n := range finalChannel {
-		fmt.Println(n)
-	}
+	// for n := range finalChannel {
+	// 	fmt.Println(n)
+	// }
+
+	// wait groups
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		fmt.Println("Waiting for 1 second...")
+		time.Sleep(time.Second)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		fmt.Println("Waiting for 2 second...")
+		time.Sleep(2 * time.Second)
+	}()
+
+	wg.Wait()
+	fmt.Println("Done")
+
 }
